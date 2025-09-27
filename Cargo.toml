@@ -1,0 +1,158 @@
+[package]
+name = "vrtest"
+description = "vara runtime tests to test contracts and built-in actors"
+edition = "2024"
+license = "MIT"
+readme = "README.md"
+version = "0.6.0"
+
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu"]
+
+[lib]
+crate-type = ["rlib"]
+
+[dependencies]
+# ----- Gear (git/tag v1.9.1) -----
+pallet-gear-builtin       = { git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1", default-features = false, features = ["std"] }
+common                    = { package = "gear-common",             git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1", default-features = false }
+core-processor            = { package = "gear-core-processor",     git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1", default-features = false }
+gbuiltin-bls381           = { package = "gbuiltin-bls381",         git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1", default-features = false }
+gbuiltin-staking          = { package = "gbuiltin-staking",        git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1" }
+gbuiltin-proxy            = { package = "gbuiltin-proxy",          git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1" }
+gear-core                 = { package = "gear-core",               git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1", default-features = false }
+gear-core-errors          = { package = "gear-core-errors",        git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1" }
+gear-runtime-interface    = { package = "gear-runtime-interface",  git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1", default-features = false }
+gprimitives               = { package = "gprimitives",             git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1", default-features = false, features = ["codec"] }
+
+# ----- Gear pallets (git/tag v1.9.1) -----
+pallet-gear               = { package = "pallet-gear",           git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1", default-features = false, features = ["std"] }
+pallet-gear-bank          = { package = "pallet-gear-bank",      git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1", default-features = false, features = ["std"] }
+pallet-gear-gas           = { package = "pallet-gear-gas",       git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1", default-features = false, features = ["std"] }
+pallet-gear-messenger     = { package = "pallet-gear-messenger", git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1", default-features = false, features = ["std"] }
+pallet-gear-program       = { package = "pallet-gear-program",   git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1", default-features = false, features = ["std"] }
+pallet-gear-scheduler     = { package = "pallet-gear-scheduler", git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1", default-features = false, features = ["std"] }
+
+# ----- Substrate / Polkadot SDK (git branch alineado) -----
+sp-core                          = { git = "https://github.com/gear-tech/polkadot-sdk.git", branch = "gear-polkadot-stable2409-wasm32v1-none", default-features = false, features = ["std"] }
+sp-externalities                 = { git = "https://github.com/gear-tech/polkadot-sdk.git", branch = "gear-polkadot-stable2409-wasm32v1-none", default-features = false, features = ["std"] }
+sp-io                            = { git = "https://github.com/gear-tech/polkadot-sdk.git", branch = "gear-polkadot-stable2409-wasm32v1-none", default-features = false, features = ["std"] }
+sp-staking                       = { git = "https://github.com/gear-tech/polkadot-sdk.git", branch = "gear-polkadot-stable2409-wasm32v1-none", default-features = false, features = ["std"] }
+frame-election-provider-support  = { git = "https://github.com/gear-tech/polkadot-sdk.git", branch = "gear-polkadot-stable2409-wasm32v1-none", default-features = false, features = ["std"] }
+frame-executive                  = { git = "https://github.com/gear-tech/polkadot-sdk.git", branch = "gear-polkadot-stable2409-wasm32v1-none", default-features = false, features = ["std"] }
+pallet-authorship                = { git = "https://github.com/gear-tech/polkadot-sdk.git", branch = "gear-polkadot-stable2409-wasm32v1-none", default-features = false, features = ["std"] }
+pallet-balances                  = { git = "https://github.com/gear-tech/polkadot-sdk.git", branch = "gear-polkadot-stable2409-wasm32v1-none", default-features = false, features = ["std"] }
+pallet-session                   = { git = "https://github.com/gear-tech/polkadot-sdk.git", branch = "gear-polkadot-stable2409-wasm32v1-none", default-features = false, features = ["std"] }
+pallet-timestamp                 = { git = "https://github.com/gear-tech/polkadot-sdk.git", branch = "gear-polkadot-stable2409-wasm32v1-none", default-features = false, features = ["std"] }
+
+frame-support                    = { git = "https://github.com/gear-tech/polkadot-sdk.git", branch = "gear-polkadot-stable2409-wasm32v1-none", default-features = false }
+frame-support-test               = { git = "https://github.com/gear-tech/polkadot-sdk.git", branch = "gear-polkadot-stable2409-wasm32v1-none", default-features = false, features = ["std"] }
+frame-system                     = { git = "https://github.com/gear-tech/polkadot-sdk.git", branch = "gear-polkadot-stable2409-wasm32v1-none", default-features = false }
+frame-benchmarking               = { git = "https://github.com/gear-tech/polkadot-sdk.git", branch = "gear-polkadot-stable2409-wasm32v1-none", default-features = false, optional = true }
+
+sp-crypto-ec-utils               = { git = "https://github.com/gear-tech/polkadot-sdk.git", branch = "gear-polkadot-stable2409-wasm32v1-none", default-features = false, features = ["bls12-381"] }
+sp-std                           = { git = "https://github.com/gear-tech/polkadot-sdk.git", branch = "gear-polkadot-stable2409-wasm32v1-none", default-features = false }
+sp-runtime                       = { git = "https://github.com/gear-tech/polkadot-sdk.git", branch = "gear-polkadot-stable2409-wasm32v1-none", default-features = false, features = ["serde"] }
+
+pallet-staking                   = { git = "https://github.com/gear-tech/polkadot-sdk.git", branch = "gear-polkadot-stable2409-wasm32v1-none", default-features = false }
+pallet-proxy                     = { git = "https://github.com/gear-tech/polkadot-sdk.git", branch = "gear-polkadot-stable2409-wasm32v1-none", default-features = false }
+
+
+parity-scale-codec   = { version = "3.7.5", default-features = false, features = ["derive"] }
+scale-info           = { version = "2.11",   default-features = false, features = ["derive", "serde"] }
+primitive-types      = { version = "0.12.2", default-features = false, features = ["scale-info"] }
+log                  = { version = "0.4.22", default-features = false }
+derive_more          = { version = "2.0.1",  default-features = false, features = ["full"] }
+impl-trait-for-tuples= { version = "0.2.2",  default-features = false }
+
+ark-serialize        = { version = "0.4",   default-features = false, features = ["derive"] }
+ark-scale            = { version = "0.0.12",default-features = false, features = ["hazmat"] }
+ark-bls12-381        = { version = "0.4.0", default-features = false, optional = true, features = ["curve"] }
+ark-ec               = { version = "0.4.2", default-features = false, optional = true }
+ark-ff               = { version = "0.4.2", default-features = false, optional = true }
+ark-std              = { version = "0.4.0", default-features = false, optional = true }
+
+tracing-subscriber   = { version = "0.3.18", features = ["env-filter"] }
+hex-literal          = { version = "0.4.1" }
+sha2                 = { version = "0.10.8", default-features = false, features = ["std"] }
+
+[dev-dependencies]
+demo-sails-staking-broker = { git = "https://github.com/Vara-Lab/Smart-Contracts-Examples", default-features = false, features = ["wasm-binary"] }
+contract                   = { git = "https://github.com/Vara-Lab/Base-Smart-Contract",     default-features = false, features = ["wasm-binary"] }
+demo-waiting-proxy         = { package = "demo-waiting-proxy", git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1" }
+demo-staking-broker        = { package = "demo-staking-broker", git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1" }
+demo-proxy-broker          = { package = "demo-proxy-broker",   git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1" }
+common                 = { package = "gear-common",             git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1", default-features = false }
+gear-core              = { package = "gear-core",               git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1", default-features = false }
+gbuiltin-staking       = { package = "gbuiltin-staking",        git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1" }
+
+
+[features]
+default = ["std"]
+
+std = [
+  "common/std",
+  "frame-benchmarking?/std",
+  "frame-support/std",
+  "frame-system/std",
+  "gear-core/std",
+  "gear-runtime-interface/std",
+  "pallet-gear/std",
+  "pallet-staking/std",
+  "pallet-proxy/std",
+  "parity-scale-codec/std",
+  "scale-info/std",
+  "sp-crypto-ec-utils/std",
+  "sp-runtime/std",
+  "sp-std/std",
+  "ark-serialize/std",
+  "ark-scale/std",
+  "ark-bls12-381?/std",
+  "ark-ec?/std",
+  "ark-ff?/std",
+  "ark-std?/std",
+  "pallet-gear-builtin/std",
+  "frame-executive/std",
+  "pallet-balances/std",
+  "gprimitives/std",
+  "gprimitives/codec",
+]
+
+runtime-benchmarks = [
+  "common/runtime-benchmarks",
+  "frame-benchmarking/runtime-benchmarks",
+  "frame-support/runtime-benchmarks",
+  "frame-system/runtime-benchmarks",
+  "pallet-staking/runtime-benchmarks",
+  "ark-bls12-381",
+  "ark-ec",
+  "ark-ff",
+  "ark-std",
+  "pallet-balances/runtime-benchmarks",
+]
+
+try-runtime = [
+  "frame-support/try-runtime",
+  "pallet-balances/try-runtime",
+]
+
+[patch.crates-io]
+parity-wasm      = { version = "0.45.0", git = "https://github.com/gear-tech/parity-wasm", branch = "v0.45.0-sign-ext" }
+wasmi-validation = { version = "0.5.0",  git = "https://github.com/gear-tech/wasmi",       branch = "v0.13.2-sign-ext" }
+
+gear-core-errors       = { git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1" }
+gear-core              = { git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1" }
+gear-core-backend      = { git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1" }
+gear-core-processor    = { git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1" }
+gear-runtime-interface = { git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1" }
+gear-sandbox           = { git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1" }
+gear-sandbox-interface = { git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1" }
+gear-common            = { git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1" }
+
+gprimitives            = { git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1" }
+gstd                   = { git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1" }
+gstd-codegen           = { git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1" }
+gcore                  = { git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1" }
+gsys                   = { git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1" }
+gear-lazy-pages-interface = { git = "https://github.com/gear-tech/gear.git", tag = "v1.9.1" }
+
