@@ -59,16 +59,29 @@ fn bonding_works() {
         );
 
         // Asserting success
-        let result = contract.new_command()
+        // let result = contract.new_command()
+        //     .signer(SIGNER)
+        //     .service_name("ContractService")
+        //     .method_name("Bond")
+        //     .payload((
+        //         100 * ONE_TOKEN,
+        //         RewardAccount::Program
+        //     ))
+        //     .with_value(100 * ONE_TOKEN)
+        //     .send_and_run_one_block();
+
+        let result = contract.new_command::<()>()
             .signer(SIGNER)
             .service_name("ContractService")
             .method_name("Bond")
-            .payload((
-                100 * ONE_TOKEN,
-                RewardAccount::Program
-            ))
+            .add_arg(100 * ONE_TOKEN)
+            .add_arg(RewardAccount::Program)
+            // .payload((
+            //     100 * ONE_TOKEN,
+            //     RewardAccount::Program
+            // ))
             .with_value(100 * ONE_TOKEN)
-            .send_and_run_one_block();
+            .send_and_run_one_block2();
 
         assert!(result.is_ok());
 
@@ -113,16 +126,30 @@ fn bonding_works() {
         // should be called instead).
         // Note: the actual added amount is limited by the message `value` field, that is
         // it's going to be 50 UNITS, not 100 UNITS as encoded in the message payload.
-        let result = contract.new_command()
+        // let result = contract.new_command()
+        //     .signer(SIGNER)
+        //     .service_name("ContractService")
+        //     .method_name("Bond")
+        //     .payload((
+        //         50 * ONE_TOKEN,
+        //         RewardAccount::Program
+        //     ))
+        //     .with_value(100 * ONE_TOKEN)
+        //     .send_and_run_one_block();
+
+        let result = contract.new_command::<()>()
             .signer(SIGNER)
             .service_name("ContractService")
             .method_name("Bond")
-            .payload((
-                50 * ONE_TOKEN,
-                RewardAccount::Program
-            ))
+            // .payload((
+            //     50 * ONE_TOKEN,
+            //     RewardAccount::Program
+            // ))
+            .add_arg(50 * ONE_TOKEN)
+            .add_arg(RewardAccount::Program)
             .with_value(100 * ONE_TOKEN)
-            .send_and_run_one_block();
+            .send_and_run_one_block2();
+            // .send_and_run_one_block();
 
         assert!(result.is_ok());
 

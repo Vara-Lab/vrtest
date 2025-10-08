@@ -36,7 +36,8 @@ pub struct CommandCall<T: Encode + Clone> {
     no_sails_command: bool,
     is_query: bool,
     get_waited: bool,
-    payload: Option<T>
+    payload: Option<T>,
+    payload2: Vec<u8>
 }
 
 impl<T: Encode + Clone> CommandCall<T> {
@@ -53,6 +54,7 @@ impl<T: Encode + Clone> CommandCall<T> {
             max_blocks_to_wait: 5,
             is_query: false,
             get_waited: true,
+            payload2: vec![],
             payload: None
         }
     }
@@ -178,6 +180,110 @@ impl<T: Encode + Clone> CommandCall<T> {
 
         Ok(())
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    pub fn add_arg(mut self, arg: impl Encode) -> Self {
+        // self.payload2.push(arg);
+        arg.encode_to(&mut self.payload2);
+
+        self
+    }
+
+    pub fn send_and_run_one_block2(self) -> Result<(), ContractCommandError> {
+        self.send2()?;
+
+        runtime::run_to_next_block();
+
+        Ok(())
+    }
+
+    pub fn send2(self) -> Result<(), ContractCommandError> {
+        self.check_data();
+
+        // let user_payload = Vec::new();
+
+        // self.payload2
+        //     .into_iter()
+        //     .for_each(|arg| user_payload);
+
+        // let user_payload = if self.payload.is_some() {
+        //     self.payload.unwrap().encode()
+        // } else {
+        //     ().encode()
+        // };
+
+        let payload = if !self.no_sails_command {
+            [
+                self.service_name.unwrap().encode(),
+                self.method_name.unwrap().encode(),
+                self.payload2
+            ]
+            .concat()
+        } else {
+            self.payload2
+        };
+
+        let result = Gear::send_message(
+            RuntimeOrigin::signed(self.signer.unwrap()), 
+            self.contract_address, 
+            payload, 
+            self.gas_limit.unwrap_or(DEFAULT_GAS_LIMIT), 
+            self.value, 
+            self.keep_alive
+        );
+
+        if let Err(error) = result {
+            return Err(ContractCommandError::CommandError(error.error));
+        }
+
+        Ok(())
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /// ## Send message to a contract and run one block
     /// Send a message to the given contract, if gas_limit not provided, it will use the Default value: 20_000_000_000
