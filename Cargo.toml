@@ -13,7 +13,7 @@ targets = ["x86_64-unknown-linux-gnu"]
 crate-type = ["rlib"]
 
 [dependencies]
-# ----- Gear (git/tag v1.9.1) -----
+# ----- Gear (git/tag v1.9.2) -----
 pallet-gear-builtin       = { git = "https://github.com/gear-tech/gear.git", tag = "v1.9.2", default-features = false, features = ["std"] }
 common                    = { package = "gear-common",             git = "https://github.com/gear-tech/gear.git", tag = "v1.9.2", default-features = false }
 core-processor            = { package = "gear-core-processor",     git = "https://github.com/gear-tech/gear.git", tag = "v1.9.2", default-features = false }
@@ -25,7 +25,7 @@ gear-core-errors          = { package = "gear-core-errors",        git = "https:
 gear-runtime-interface    = { package = "gear-runtime-interface",  git = "https://github.com/gear-tech/gear.git", tag = "v1.9.2", default-features = false }
 gprimitives               = { package = "gprimitives",             git = "https://github.com/gear-tech/gear.git", tag = "v1.9.2", default-features = false, features = ["codec"] }
 
-# ----- Gear pallets (git/tag v1.9.1) -----
+# ----- Gear pallets (git/tag v1.9.2) -----
 pallet-gear               = { package = "pallet-gear",           git = "https://github.com/gear-tech/gear.git", tag = "v1.9.2", default-features = false, features = ["std"] }
 pallet-gear-bank          = { package = "pallet-gear-bank",      git = "https://github.com/gear-tech/gear.git", tag = "v1.9.2", default-features = false, features = ["std"] }
 pallet-gear-gas           = { package = "pallet-gear-gas",       git = "https://github.com/gear-tech/gear.git", tag = "v1.9.2", default-features = false, features = ["std"] }
