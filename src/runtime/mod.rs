@@ -1,64 +1,31 @@
-use frame_system::{
-    pallet_prelude::BlockNumberFor,
-    limits::BlockWeights,
+use common::{storage::Limiter, GasTree, MessageId, Origin};
+use frame_support::{
+    assert_ok,
+    pallet_prelude::{DispatchClass, Weight},
+    traits::{EstimateNextSessionRotation, Get, OnFinalize, OnInitialize},
+};
+use frame_system::{limits::BlockWeights, pallet_prelude::BlockNumberFor};
+use gear_core::ids::{
+    prelude::{ActorIdExt, CodeIdExt},
+    CodeId,
 };
 use gear_core_errors::{ErrorReplyReason, ReplyCode, SimpleExecutionError};
-use sp_runtime::testing::UintAuthorityId;
-use frame_support::{
-    pallet_prelude::{
-        DispatchClass,
-        Weight
-    },
-    traits::{
-        OnFinalize, 
-        OnInitialize,
-        EstimateNextSessionRotation, 
-        Get
-    },
-    assert_ok
-};
-use common::{storage::Limiter, GasTree, MessageId, Origin};
-use gear_core::ids::{prelude::{ActorIdExt, CodeIdExt}, CodeId};
 use gprimitives::ActorId;
 use pallet_gear::Event as GearEvent;
 use pallet_gear_builtin::GasAllowanceOf;
+use sp_runtime::testing::UintAuthorityId;
 
+use crate::ext_builder::ExtBuilder;
 use crate::mock::{
-    Period,
-    Offset,
-    Authorship, 
-    Balances, 
-    Gear, 
-    GearBank, 
-    GearBuiltin, 
-    GearGas, 
-    GearMessenger, 
-    GearProgram, 
-    GearScheduler, 
-    Historical, 
-    Proxy, 
-    RuntimeEvent, 
-    RuntimeOrigin, 
-    Session, 
-    Staking, 
-    System, 
-    Test, 
-    Timestamp
-};
-use crate::types::{
-    BlockWeightsOf,
-    QueueOf,
-    GasTreeOf,
-    GasHandlerOf,
-    AccountId,
-    Balance,
-    StakingEventType,
-    DEFAULT_GAS_LIMIT,
-    ENDOWMENT,
-    MILLISECS_PER_BLOCK,
+    Authorship, Balances, Gear, GearBank, GearBuiltin, GearGas, GearMessenger, GearProgram,
+    GearScheduler, Historical, Offset, Period, Proxy, RuntimeEvent, RuntimeOrigin, Session,
+    Staking, System, Test, Timestamp,
 };
 use crate::runtime_types::*;
-use crate::ext_builder::ExtBuilder;
+use crate::types::{
+    AccountId, Balance, BlockWeightsOf, GasHandlerOf, GasTreeOf, QueueOf, StakingEventType,
+    DEFAULT_GAS_LIMIT, ENDOWMENT,
+};
 
 use crate::contract::Contract;
 
@@ -74,7 +41,7 @@ pub fn u64_to_origin_u64(account: u64) -> u64 {
     u64::from_origin(account.into_origin())
 }
 
-/// Bloque duration in ms 
+/// Bloque duration in ms
 pub fn block_in_ms() -> u64 {
     <Test as pallet_timestamp::Config>::MinimumPeriod::get().saturating_mul(2)
 }
@@ -123,10 +90,11 @@ pub fn current_era_index() -> u32 {
     pallet_staking::Pallet::<Test>::active_era().unwrap().index
 }
 
-/// Estimated block to the next sesion rotation 
+/// Estimated block to the next sesion rotation
 pub fn next_session_rotation_block() -> Option<u64> {
     let now = current_block();
-    let (block, __) = <Test as pallet_session::Config>::NextSessionRotation::estimate_next_session_rotation(now);
+    let (block, __) =
+        <Test as pallet_session::Config>::NextSessionRotation::estimate_next_session_rotation(now);
 
     block
 }
@@ -143,7 +111,7 @@ pub fn move_n_bonding_durations(bonding_durations: u32) {
 /// ## Return contract nominations
 pub fn contract_nominators(contract: &Contract) -> Vec<u64> {
     let targets_before = pallet_staking::Nominators::<Test>::get(contract.account)
-            .map_or_else(Vec::new, |x| x.targets.into_inner());
+        .map_or_else(Vec::new, |x| x.targets.into_inner());
 
     targets_before
 }
@@ -181,39 +149,37 @@ pub fn run_for_n_blocks(n: u64, remaining_weight: Option<u64>) {
 
 /// ## User balance
 /// Returns the user balance.
-/// 
+///
 /// To know the balance of a contract use: contract_free_balance
 pub fn balance_from_user(address: u64) -> u128 {
     Balances::free_balance(address)
 }
 
 /// ## Upload the sails contract wasm
-/// This function will upload the given wasm (&[u8]) with a initial payload and will return a Contract 
+/// This function will upload the given wasm (&[u8]) with a initial payload and will return a Contract
 /// struct that can be used to check contrect data, send message to it, etc.
-/// 
+///
 /// And, at the end, it will run to the next block
 pub fn upload_sails_wasm<T: Encode>(
     signer: AccountId,
-    wasm: &[u8], 
-    init_payload: T, 
-    salt: &[u8], 
-    gas_limit: Option<u64>
+    wasm: &[u8],
+    init_payload: T,
+    salt: &[u8],
+    gas_limit: Option<u64>,
 ) -> Contract {
     let contract_id = ActorId::generate_from_user(CodeId::generate(wasm), b"contract");
     let contract_account_id = u64::from_origin(contract_id.into_origin());
     let gas_limit = gas_limit.unwrap_or(DEFAULT_GAS_LIMIT);
 
-    assert_ok!(
-        Gear::upload_program(
-            RuntimeOrigin::signed(signer), 
-            wasm.to_vec(), 
-            salt.to_vec(), 
-            init_payload.encode(), 
-            gas_limit, 
-            0, 
-            false
-        )
-    );
+    assert_ok!(Gear::upload_program(
+        RuntimeOrigin::signed(signer),
+        wasm.to_vec(),
+        salt.to_vec(),
+        init_payload.encode(),
+        gas_limit,
+        0,
+        false
+    ));
 
     run_to_next_block();
 
@@ -223,31 +189,29 @@ pub fn upload_sails_wasm<T: Encode>(
 }
 
 /// ## Upload the contract wasm
-/// This function will upload the given wasm (&[u8]) and will return a Contract struct that can be used to 
+/// This function will upload the given wasm (&[u8]) and will return a Contract struct that can be used to
 /// check contrect data, send message to it, etc.
-/// 
+///
 /// And, at the end, it will run to the next block
 pub fn upload_wasm(
-    wasm: &[u8], 
-    signer: AccountId, 
-    salt: &[u8], 
-    gas_limit: Option<u64>
+    wasm: &[u8],
+    signer: AccountId,
+    salt: &[u8],
+    gas_limit: Option<u64>,
 ) -> Contract {
     let contract_id = ActorId::generate_from_user(CodeId::generate(wasm), b"contract");
     let contract_account_id = u64::from_origin(contract_id.into_origin());
     let gas_limit = gas_limit.unwrap_or(DEFAULT_GAS_LIMIT);
 
-    assert_ok!(
-        Gear::upload_program(
-            RuntimeOrigin::signed(signer), 
-            wasm.to_vec(), 
-            salt.to_vec(), 
-            Default::default(), 
-            gas_limit, 
-            0, 
-            false
-        )
-    );
+    assert_ok!(Gear::upload_program(
+        RuntimeOrigin::signed(signer),
+        wasm.to_vec(),
+        salt.to_vec(),
+        Default::default(),
+        gas_limit,
+        0,
+        false
+    ));
 
     run_to_next_block();
 
@@ -258,7 +222,7 @@ pub fn upload_wasm(
 
 // Run on_initialize hooks in order as they appear in AllPalletsWithSystem.
 pub(crate) fn on_initialize(new_block_number: BlockNumberFor<Test>) {
-    // 
+    //
     System::on_initialize(new_block_number);
 
     // Timestamp::set_timestamp(new_block_number.saturating_mul(MILLISECS_PER_BLOCK));
@@ -269,7 +233,6 @@ pub(crate) fn on_initialize(new_block_number: BlockNumberFor<Test>) {
     // GearMessenger::on_initialize(new_block_number);
     // Gear::on_initialize(new_block_number);
     // GearBank::on_initialize(new_block_number);
-
 
     Authorship::on_initialize(new_block_number);
     Session::on_initialize(new_block_number);
@@ -343,14 +306,18 @@ pub fn gas_tree_empty() -> bool {
         && <GasHandlerOf<Test> as GasTree>::total_supply() == 0
 }
 
-pub fn message_id_fom_message_sent(
-    signer: u64,
-    contract_id: ActorId
-) -> Option<MessageId> {
+pub fn message_id_fom_message_sent(signer: u64, contract_id: ActorId) -> Option<MessageId> {
     let mut msg_id = None;
 
     for ev in System::events() {
-        if let RuntimeEvent::Gear(GearEvent::MessageQueued { id, source, destination, .. }) = &ev.event { // [TODO]: check for entry field update
+        if let RuntimeEvent::Gear(GearEvent::MessageQueued {
+            id,
+            source,
+            destination,
+            ..
+        }) = &ev.event
+        {
+            // [TODO]: check for entry field update
             if *source == signer && *destination == contract_id {
                 msg_id = Some(*id);
             }
@@ -367,14 +334,12 @@ pub fn assert_staking_events(contract: &Contract, balance: Balance, t: StakingEv
             RuntimeEvent::Staking(pallet_staking::Event::<Test>::Bonded { stash, amount }) => {
                 t == StakingEventType::Bonded && stash == contract.account && balance == amount
             }
-            RuntimeEvent::Staking(pallet_staking::Event::<Test>::Unbonded {
-                stash,
-                amount,
-            }) => t == StakingEventType::Unbonded && stash == contract.account && balance == amount,
-            RuntimeEvent::Staking(pallet_staking::Event::<Test>::Withdrawn {
-                stash,
-                amount,
-            }) => t == StakingEventType::Withdrawn && stash == contract.account && balance == amount,
+            RuntimeEvent::Staking(pallet_staking::Event::<Test>::Unbonded { stash, amount }) => {
+                t == StakingEventType::Unbonded && stash == contract.account && balance == amount
+            }
+            RuntimeEvent::Staking(pallet_staking::Event::<Test>::Withdrawn { stash, amount }) => {
+                t == StakingEventType::Withdrawn && stash == contract.account && balance == amount
+            }
             _ => false,
         }
     }))
@@ -382,11 +347,9 @@ pub fn assert_staking_events(contract: &Contract, balance: Balance, t: StakingEv
 
 #[track_caller]
 pub fn assert_no_staking_events() {
-    assert!(
-        System::events()
-            .into_iter()
-            .all(|e| { !matches!(e.event, RuntimeEvent::Staking(_)) })
-    )
+    assert!(System::events()
+        .into_iter()
+        .all(|e| { !matches!(e.event, RuntimeEvent::Staking(_)) }))
 }
 
 #[track_caller]
@@ -442,7 +405,6 @@ pub fn rollback_transaction() {
     set_transaction_flag(false);
 }
 
-
 /// ## Create a new runtime test
 /// This function will init the tests, you need to pass the address that will receive tokens (1000 tokens)
 pub fn new_test_ext(addresses_to_fund_tokens: Vec<u64>) -> sp_io::TestExternalities {
@@ -464,7 +426,7 @@ pub fn new_test_ext(addresses_to_fund_tokens: Vec<u64>) -> sp_io::TestExternalit
 /// and initial authorities
 pub fn new_test_ext_with_authorities(
     addresses_to_fund_tokens: Vec<u64>,
-    initial_authorities: Vec<u64>
+    initial_authorities: Vec<u64>,
 ) -> sp_io::TestExternalities {
     let bank_address = GearBank::bank_address();
 
@@ -485,7 +447,7 @@ pub fn new_test_ext_with_authorities(
         .build()
 }
 
-// /// ## Create a new runtime test 
+// /// ## Create a new runtime test
 // /// This function will init the tests, you need to pass the address that will receive tokens (1000 tokens),
 // /// this function will enable session to manage rewards from staking, etc.
 // pub fn new_test_ext_with_sessions(
@@ -505,12 +467,12 @@ pub fn new_test_ext_with_authorities(
 //         .build()
 // }
 
-/// ## Create a new runtime test 
+/// ## Create a new runtime test
 /// This function will init the tests, you need to pass the address that will receive tokens (1000 tokens),
 /// and initial authorities, this function will enable session to manage rewards from staking, etc.
 pub fn new_test_ext_with_authorities_and_sessions(
     addresses_to_fund_tokens: Vec<u64>,
-    initial_authorities: Vec<(u64, u64)>
+    initial_authorities: Vec<(u64, u64)>,
 ) -> sp_io::TestExternalities {
     let bank_address = GearBank::bank_address();
 
@@ -521,7 +483,9 @@ pub fn new_test_ext_with_authorities_and_sessions(
 
     let initial_authorities = initial_authorities
         .into_iter()
-        .map(|(authority_address, authority_auth_id)| (authority_address, Some(UintAuthorityId(authority_auth_id))))
+        .map(|(authority_address, authority_auth_id)| {
+            (authority_address, Some(UintAuthorityId(authority_auth_id)))
+        })
         .collect();
 
     ExtBuilder::default()
@@ -531,12 +495,3 @@ pub fn new_test_ext_with_authorities_and_sessions(
         .with_sessions()
         .build()
 }
-
-
-
-
-
-
-
-
-

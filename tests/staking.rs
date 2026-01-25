@@ -46,7 +46,7 @@ fn bonding_works() {
         let gas_fees = contract.new_calculate_gas()
             .signer(SIGNER)
             .with_value(100 * ONE_TOKEN)
-            .payload(Request::Bond { 
+            .add_arg(Request::Bond { 
                 value: 100 * ONE_TOKEN,
                 payee: RewardAccount::Program 
             })
@@ -63,7 +63,7 @@ fn bonding_works() {
         let result = contract.new_command()
             .signer(SIGNER)
             .with_value(100 * ONE_TOKEN)
-            .payload(Request::Bond { 
+            .add_arg(Request::Bond { 
                 value: 100 * ONE_TOKEN, 
                 payee: RewardAccount::Program 
             })
@@ -99,7 +99,7 @@ fn bonding_works() {
         let gas_fees = contract.new_calculate_gas()
             .signer(SIGNER)
             .with_value(100 * ONE_TOKEN)
-            .payload(Request::Bond { 
+            .add_arg(Request::Bond { 
                 value: 50 * ONE_TOKEN,
                 payee: RewardAccount::Program 
             })
@@ -113,7 +113,7 @@ fn bonding_works() {
         let result = contract.new_command()
             .signer(SIGNER)
             .with_value(100 * ONE_TOKEN)
-            .payload(Request::Bond { 
+            .add_arg(Request::Bond { 
                 value: 50 * ONE_TOKEN, 
                 payee: RewardAccount::Program 
             })
@@ -157,7 +157,7 @@ fn unbonding_works() {
         let _ = contract.new_command()
             .signer(SIGNER)
             .with_value(100 * ONE_TOKEN)
-            .payload(Request::Bond { 
+            .add_arg(Request::Bond { 
                 value: 100 * ONE_TOKEN, 
                 payee: RewardAccount::None 
             })
@@ -175,14 +175,14 @@ fn unbonding_works() {
 
         let _ = contract.new_calculate_gas()
             .signer(SIGNER)
-            .payload(Request::Unbond { value: 200 * ONE_TOKEN })
+            .add_arg(Request::Unbond { value: 200 * ONE_TOKEN })
             .no_sails_command()
             .calculate_gas();
 
         // Sending `unbond` message
         let result = contract.new_command()
             .signer(SIGNER)
-            .payload(Request::Unbond { value: 200 * ONE_TOKEN })
+            .add_arg(Request::Unbond { value: 200 * ONE_TOKEN })
             .no_sails_command()
             .send_and_run_one_block();
 
@@ -215,7 +215,7 @@ fn nominators_payload_size_matters() {
 
         let result = contract.new_command()
             .signer(SIGNER)
-            .payload(Request::Nominate { 
+            .add_arg(Request::Nominate { 
                 targets 
             })
             .no_sails_command()
@@ -265,7 +265,7 @@ fn nominating_works() {
 
         let result = contract.new_command()
             .signer(SIGNER)
-            .payload(Request::Nominate { 
+            .add_arg(Request::Nominate { 
                 targets: targets.clone()
             })
             .no_sails_command()
@@ -285,7 +285,7 @@ fn nominating_works() {
         let result = contract.new_command()
             .signer(SIGNER)
             .with_value(100 * ONE_TOKEN)
-            .payload(Request::Bond { 
+            .add_arg(Request::Bond { 
                 value: 100 * ONE_TOKEN, 
                 payee: RewardAccount::Program 
             })
@@ -304,7 +304,7 @@ fn nominating_works() {
 
         let result = contract.new_command()
             .signer(SIGNER)
-            .payload(Request::Nominate { 
+            .add_arg(Request::Nominate { 
                 targets: targets.clone() 
             })
             .no_sails_command()
@@ -342,7 +342,7 @@ fn withdraw_unbonded_works() {
         let result = contract.new_command()
             .signer(SIGNER)
             .with_value(500 * ONE_TOKEN)
-            .payload(Request::Bond { 
+            .add_arg(Request::Bond { 
                 value: 500 * ONE_TOKEN, 
                 payee: RewardAccount::Program 
             })
@@ -363,7 +363,7 @@ fn withdraw_unbonded_works() {
 
         let result = contract.new_command()
             .signer(SIGNER)
-            .payload(Request::Unbond { 
+            .add_arg(Request::Unbond { 
                 value: 200 * ONE_TOKEN 
             })
             .no_sails_command()
@@ -387,7 +387,7 @@ fn withdraw_unbonded_works() {
 
         let result = contract.new_command()
             .signer(SIGNER)
-            .payload(Request::WithdrawUnbonded { 
+            .add_arg(Request::WithdrawUnbonded { 
                 num_slashing_spans: 0 
             })
             .no_sails_command()
@@ -425,7 +425,7 @@ fn set_payee_works() {
         let result = contract.new_command()
             .signer(SIGNER)
             .with_value(100 * ONE_TOKEN)
-            .payload(Request::Bond { 
+            .add_arg(Request::Bond { 
                 value: 100 * ONE_TOKEN, 
                 payee: RewardAccount::Program 
             })
@@ -446,7 +446,7 @@ fn set_payee_works() {
         // Set the `payee` to SIGNER
         let result = contract.new_command()
             .signer(SIGNER)
-            .payload(Request::SetPayee { 
+            .add_arg(Request::SetPayee { 
                 // payee: RewardAccount::Custom(REWARD_PAYEE.into_origin().into())
                 payee: RewardAccount::Custom(ActorId32::from(REWARD_PAYEE))
             })
@@ -480,7 +480,7 @@ fn rebond_works() {
         let result = contract.new_command()
             .signer(SIGNER)
             .with_value(500 * ONE_TOKEN)
-            .payload(Request::Bond { 
+            .add_arg(Request::Bond { 
                 value: 500 * ONE_TOKEN, 
                 payee: RewardAccount::Program 
             })
@@ -499,7 +499,7 @@ fn rebond_works() {
         // Sending `unbond` message
         let result = contract.new_command()
             .signer(SIGNER)
-            .payload(Request::Unbond { 
+            .add_arg(Request::Unbond { 
                 value: 400 * ONE_TOKEN 
             })
             .no_sails_command()
@@ -525,7 +525,7 @@ fn rebond_works() {
         // Sending `rebond` message
         let result = contract.new_command()
             .signer(SIGNER)
-            .payload(Request::Rebond { 
+            .add_arg(Request::Rebond { 
                 value: 200 * ONE_TOKEN 
             })
             .no_sails_command()
@@ -548,7 +548,7 @@ fn rebond_works() {
         // Sending another `rebond` message, with `value` exceeding the unlocking amount
         let result = contract.new_command()
             .signer(SIGNER)
-            .payload(Request::Rebond { 
+            .add_arg(Request::Rebond { 
                 value: 300 * ONE_TOKEN 
             })
             .no_sails_command()
@@ -599,7 +599,7 @@ fn payout_stakers_works() { // rewards
         let result = contract.new_command()
             .signer(SIGNER)
             .with_value(250 * ONE_TOKEN)
-            .payload(Request::Bond { 
+            .add_arg(Request::Bond { 
                 value: 250 * ONE_TOKEN, 
                 // payee: RewardAccount::Custom(REWARD_PAYEE.into_origin().into()) 
                 payee: RewardAccount::Custom(ActorId32::from(REWARD_PAYEE)) 
@@ -614,7 +614,7 @@ fn payout_stakers_works() { // rewards
         // Nomintate the validator
         let result = contract.new_command()
             .signer(SIGNER)
-            .payload(Request::Nominate { 
+            .add_arg(Request::Nominate { 
                 targets: targets.clone() 
             })
             .no_sails_command()
@@ -642,7 +642,7 @@ fn payout_stakers_works() { // rewards
         let result = contract.new_command()
             .signer(SIGNER)
             .gas_limit(300_000_000_000)
-            .payload(Request::PayoutStakers { 
+            .add_arg(Request::PayoutStakers { 
                 validator_stash: ActorId32::from(VAL_1_STASH), // VAL_1_STASH.cast(), 
                 era: 1 
             })

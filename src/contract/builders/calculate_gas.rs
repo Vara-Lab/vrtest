@@ -18,7 +18,7 @@ pub struct GasEstimation {
     pub waited: bool,
 }
 
-pub struct CalculateGasCall<T: Encode> {
+pub struct CalculateGasCall {
     contract_address: ActorId,
     signer: Option<u64>, 
     service_name: Option<String>, 
@@ -28,10 +28,10 @@ pub struct CalculateGasCall<T: Encode> {
     initial_gas: Option<u64>,
     gas_allowance: Option<u64>,
     no_sails_command: bool,
-    payload: Option<T>, 
+    payload: Vec<u8>
 }
 
-impl<T: Encode> CalculateGasCall<T> {
+impl CalculateGasCall {
     pub fn new(contract_address: ActorId) -> Self {
         Self {
             contract_address,
@@ -43,7 +43,7 @@ impl<T: Encode> CalculateGasCall<T> {
             initial_gas: None,
             gas_allowance: None,
             no_sails_command: false,
-            payload: None
+            payload: vec![]
         }
     }
 
@@ -95,8 +95,10 @@ impl<T: Encode> CalculateGasCall<T> {
         self
     }
 
-    pub fn payload(mut self, payload: T) -> Self {
-        self.payload = Some(payload);
+    /// ## Add an argument to the payload
+    /// This method will add arguments into the payload (args that you can find in your .idl)
+    pub fn add_arg(mut self, arg: impl Encode) -> Self {
+        arg.encode_to(&mut self.payload);
 
         self
     }
@@ -122,22 +124,33 @@ impl<T: Encode> CalculateGasCall<T> {
 
         runtime::start_transaction();
 
-        let user_payload = if self.payload.is_some() {
-            self.payload.unwrap().encode()
-        } else {
-            ().encode()
-        };
-
         let payload = if !self.no_sails_command {
             [
                 self.service_name.unwrap().encode(),
                 self.method_name.unwrap().encode(),
-                user_payload
+                self.payload
             ]
             .concat()
         } else {
-            user_payload
+            self.payload
         };
+
+        // let user_payload = if self.payload.is_some() {
+        //     self.payload.unwrap().encode()
+        // } else {
+        //     ().encode()
+        // };
+
+        // let payload = if !self.no_sails_command {
+        //     [
+        //         self.service_name.unwrap().encode(),
+        //         self.method_name.unwrap().encode(),
+        //         user_payload
+        //     ]
+        //     .concat()
+        // } else {
+        //     user_payload
+        // };
 
         let res = Gear::calculate_gas_info(
             self.signer.unwrap().into_origin(), 

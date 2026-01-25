@@ -1,11 +1,13 @@
+use common::Origin;
 use gprimitives::ActorId;
+use parity_scale_codec::{Decode, Encode, MaxEncodedLen};
 use primitive_types::H256;
-use parity_scale_codec::{Encode, Decode, MaxEncodedLen, Input, Output, Error};
 use primitive_types::U256;
 use scale_info::TypeInfo;
-use common::Origin;
 
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Debug, Default, Encode, Decode, TypeInfo, MaxEncodedLen)]
+#[derive(
+    Clone, Copy, PartialEq, Eq, Hash, Debug, Default, Encode, Decode, TypeInfo, MaxEncodedLen,
+)]
 pub struct ActorId32([u8; 32]);
 
 impl ActorId32 {
@@ -13,11 +15,15 @@ impl ActorId32 {
         // gprimitives::ActorId tiene From<[u8;32]> (derive_more::From)
         ActorId::from(self.0)
     }
-    pub fn as_bytes(&self) -> &[u8;32] { &self.0 }
+    pub fn as_bytes(&self) -> &[u8; 32] {
+        &self.0
+    }
 }
 
 impl From<[u8; 32]> for ActorId32 {
-    fn from(b: [u8;32]) -> Self { Self(b) }
+    fn from(b: [u8; 32]) -> Self {
+        Self(b)
+    }
 }
 // impl From<u64> for ActorId32 {
 //     // fn from(value: u64) -> Self {
@@ -42,7 +48,6 @@ impl From<u64> for ActorId32 {
         ActorId32::from(aid)
     }
 }
-
 
 impl From<U256> for ActorId32 {
     fn from(x: U256) -> Self {
@@ -83,7 +88,7 @@ impl From<ActorId> for ActorId32 {
 
 /* (Opcional) permitir usarlo donde pidan ActorId vía Into */
 impl From<ActorId32> for ActorId {
-    fn from(a: ActorId32) -> Self { ActorId::from(a.0) }
+    fn from(a: ActorId32) -> Self {
+        ActorId::from(a.0)
+    }
 }
-
-

@@ -43,7 +43,7 @@ impl Contract {
         UploadSailsWasm::new()
     }
 
-    pub fn new_command<R: Encode + Clone>(&self) -> CommandCall<R> {
+    pub fn new_command(&self) -> CommandCall {
         CommandCall::new(self.address.clone())
     }
 
@@ -51,7 +51,7 @@ impl Contract {
     //     QueryCall::new(self.address.clone())
     // }
 
-    pub fn new_calculate_gas<R: Encode>(&self) -> CalculateGasCall<R> {
+    pub fn new_calculate_gas(&self) -> CalculateGasCall {
         CalculateGasCall::new(self.address.clone())
     }
 

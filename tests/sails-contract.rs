@@ -28,7 +28,7 @@ pub fn hello_send_message() {
             .signer(SIGNER)
             .service_name("ContractService")
             .method_name("Hello")
-            .payload(())
+            .add_arg(())
             .send();
 
         assert!(result.is_ok());
@@ -40,7 +40,7 @@ pub fn hello_send_message_get_reply() {
     init_logger();
 
     new_test_ext(vec![SIGNER]).execute_with(|| {{
-        // With turbofish because it does not includes payload
+        // With turbofish because it does not includes init payload
         let contract = Contract::upload_sails_contract::<()>()
             .signer(SIGNER)
             .salt("contract")
@@ -48,9 +48,7 @@ pub fn hello_send_message_get_reply() {
             .wasm(WASM_BINARY)
             .upload();
 
-        // With turbofish to avoid .payload(()) call because the payload function set the type 
-        // of the payload to send to the contract
-        let x = contract.new_command::<()>()
+        let x = contract.new_command()
             .signer(SIGNER)
             .service_name("ContractService")
             .method_name("Hello")
@@ -86,7 +84,7 @@ pub fn send_value() {
 
         let user_balance = balance_from_user(SIGNER);
 
-        let _gas_fees = contract.new_calculate_gas::<()>()
+        let _gas_fees = contract.new_calculate_gas()
             .signer(SIGNER)
             .with_value(ONE_TOKEN)
             .service_name("ContractService")
@@ -98,7 +96,7 @@ pub fn send_value() {
             balance_from_user(SIGNER)
         );
 
-        let result = contract.new_command::<()>()
+        let result = contract.new_command()
             .signer(SIGNER)
             .with_value(ONE_TOKEN)
             .service_name("ContractService")
@@ -133,14 +131,14 @@ pub fn get_set_counter() {
             .upload();
 
 
-        let _gas_fees = contract.new_calculate_gas::<()>()
+        let _gas_fees = contract.new_calculate_gas()
             .signer(SIGNER)
             .with_value(ONE_TOKEN)
             .service_name("ContractService")
             .method_name("Increment")
             .calculate_gas();
 
-        let result = contract.new_command::<()>()
+        let result = contract.new_command()
             .signer(SIGNER)
             .service_name("ContractService")
             .method_name("Increment")
@@ -148,7 +146,7 @@ pub fn get_set_counter() {
 
         assert!(result.is_ok());
 
-        let _gas_fees = contract.new_calculate_gas::<()>()
+        let _gas_fees = contract.new_calculate_gas()
             .signer(SIGNER)
             .with_value(ONE_TOKEN)
             .service_name("ContractService")
@@ -162,7 +160,7 @@ pub fn get_set_counter() {
             balance_from_user(SIGNER)
         );
 
-        let result = contract.new_command::<()>()
+        let result = contract.new_command()
             .signer(SIGNER)
             .service_name("ContractService")
             .method_name("CounterValue")

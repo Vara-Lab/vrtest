@@ -24,7 +24,7 @@ use crate::{
 // /// ## Read state 
 // /// Read state from a query method from a contract, yo need to provide the type to decode the result
 
-pub struct CommandCall<T: Encode + Clone> {
+pub struct CommandCall {
     contract_address: ActorId,
     signer: Option<u64>,
     service_name: Option<String>,
@@ -36,11 +36,10 @@ pub struct CommandCall<T: Encode + Clone> {
     no_sails_command: bool,
     is_query: bool,
     get_waited: bool,
-    payload: Option<T>,
-    payload2: Vec<u8>
+    payload: Vec<u8>
 }
 
-impl<T: Encode + Clone> CommandCall<T> {
+impl CommandCall {
     pub fn new(contract_address: ActorId) -> Self {
         Self {
             contract_address,
@@ -54,8 +53,7 @@ impl<T: Encode + Clone> CommandCall<T> {
             max_blocks_to_wait: 5,
             is_query: false,
             get_waited: true,
-            payload2: vec![],
-            payload: None
+            payload: vec![],
         }
     }
 
@@ -123,12 +121,6 @@ impl<T: Encode + Clone> CommandCall<T> {
         self
     }
 
-    pub fn payload(mut self, payload: T) -> Self {
-        self.payload = Some(payload);
-
-        self
-    }
-
     fn check_data(&self) {
         if self.service_name.is_none() && !self.no_sails_command {
             panic!("Service name is not set!");
@@ -143,147 +135,13 @@ impl<T: Encode + Clone> CommandCall<T> {
         }
     }
 
-    /// ## Send message to a contract
-    /// Send a message to the given contract, if gas_limit not provided, it will use the Default value: 20_000_000_000
-    pub fn send(self) -> Result<(), ContractCommandError> {
-        self.check_data();
-
-        let user_payload = if self.payload.is_some() {
-            self.payload.unwrap().encode()
-        } else {
-            ().encode()
-        };
-
-        let payload = if !self.no_sails_command {
-            [
-                self.service_name.unwrap().encode(),
-                self.method_name.unwrap().encode(),
-                user_payload
-            ]
-            .concat()
-        } else {
-            user_payload
-        };
-
-        let result = Gear::send_message(
-            RuntimeOrigin::signed(self.signer.unwrap()), 
-            self.contract_address, 
-            payload, 
-            self.gas_limit.unwrap_or(DEFAULT_GAS_LIMIT), 
-            self.value, 
-            self.keep_alive
-        );
-
-        if let Err(error) = result {
-            return Err(ContractCommandError::CommandError(error.error));
-        }
-
-        Ok(())
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    /// ## Add an argument to the payload
+    /// This method will add arguments into the payload (args that you can find in your .idl)
     pub fn add_arg(mut self, arg: impl Encode) -> Self {
-        // self.payload2.push(arg);
-        arg.encode_to(&mut self.payload2);
+        arg.encode_to(&mut self.payload);
 
         self
     }
-
-    pub fn send_and_run_one_block2(self) -> Result<(), ContractCommandError> {
-        self.send2()?;
-
-        runtime::run_to_next_block();
-
-        Ok(())
-    }
-
-    pub fn send2(self) -> Result<(), ContractCommandError> {
-        self.check_data();
-
-        // let user_payload = Vec::new();
-
-        // self.payload2
-        //     .into_iter()
-        //     .for_each(|arg| user_payload);
-
-        // let user_payload = if self.payload.is_some() {
-        //     self.payload.unwrap().encode()
-        // } else {
-        //     ().encode()
-        // };
-
-        let payload = if !self.no_sails_command {
-            [
-                self.service_name.unwrap().encode(),
-                self.method_name.unwrap().encode(),
-                self.payload2
-            ]
-            .concat()
-        } else {
-            self.payload2
-        };
-
-        let result = Gear::send_message(
-            RuntimeOrigin::signed(self.signer.unwrap()), 
-            self.contract_address, 
-            payload, 
-            self.gas_limit.unwrap_or(DEFAULT_GAS_LIMIT), 
-            self.value, 
-            self.keep_alive
-        );
-
-        if let Err(error) = result {
-            return Err(ContractCommandError::CommandError(error.error));
-        }
-
-        Ok(())
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     /// ## Send message to a contract and run one block
     /// Send a message to the given contract, if gas_limit not provided, it will use the Default value: 20_000_000_000
@@ -293,6 +151,38 @@ impl<T: Encode + Clone> CommandCall<T> {
         self.send()?;
 
         runtime::run_to_next_block();
+
+        Ok(())
+    }
+
+    /// ## Send message to a contract
+    /// Send a message to the given contract, if gas_limit not provided, it will use the Default value: 20_000_000_000
+    pub fn send(self) -> Result<(), ContractCommandError> {
+        self.check_data();
+
+        let payload = if !self.no_sails_command {
+            [
+                self.service_name.unwrap().encode(),
+                self.method_name.unwrap().encode(),
+                self.payload
+            ]
+            .concat()
+        } else {
+            self.payload
+        };
+
+        let result = Gear::send_message(
+            RuntimeOrigin::signed(self.signer.unwrap()), 
+            self.contract_address, 
+            payload, 
+            self.gas_limit.unwrap_or(DEFAULT_GAS_LIMIT), 
+            self.value, 
+            self.keep_alive
+        );
+
+        if let Err(error) = result {
+            return Err(ContractCommandError::CommandError(error.error));
+        }
 
         Ok(())
     }

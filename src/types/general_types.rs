@@ -1,6 +1,6 @@
-use sp_runtime::DispatchError;
-use common::{GasProvider, event::DispatchStatus};
 use crate::mock::Test;
+use common::{event::DispatchStatus, GasProvider};
+use sp_runtime::DispatchError;
 
 pub type AccountId = u64;
 pub type BlockNumber = u64;
@@ -19,6 +19,7 @@ pub(crate) const EXISTENTIAL_DEPOSIT: u128 = 1 * UNITS;
 pub const ENDOWMENT: u128 = 1_000 * UNITS;
 
 pub(crate) const UNITS: u128 = 1_000_000_000_000; // 10^(-12) precision
+#[allow(unused)]
 pub(crate) const MILLISECS_PER_BLOCK: u64 = 2_400;
 
 pub(crate) const DEFAULT_GAS_LIMIT: u64 = 20_000_000_000;
@@ -41,13 +42,12 @@ pub const CONTRACT_EXISTENCIAL_DEPOSIT: u128 = EXISTENTIAL_DEPOSIT;
 
 // Contract util data
 
-
 /// ## Error in query calls to contracts
 #[derive(Debug)]
 pub enum ContractQueryError {
     QueryError(DispatchError),
     ReadStateError(String),
-    ResultDecodeError(String)
+    ResultDecodeError(String),
 }
 
 /// ## Error in command calls to contracts
@@ -66,5 +66,3 @@ pub enum ContractResponse<R> {
     OkNoReply,
     Waited,
 }
-
-

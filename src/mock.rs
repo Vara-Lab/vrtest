@@ -1,58 +1,29 @@
-use frame_support_test::TestRandomness;
-use sp_runtime::{
-    Perbill, 
-    Permill, 
-    traits::{
-        BlakeTwo256, 
-        IdentityLookup
-    },
+use frame_election_provider_support::{
+    bounds::{ElectionBounds, ElectionBoundsBuilder},
+    onchain,
 };
 use frame_support::{
-    PalletId, construct_runtime,
-    parameter_types,
-    traits::{
-        ConstU32,
-        ConstU64,
-        ConstBool,
-        FindAuthor,
-    }
+    construct_runtime, parameter_types,
+    traits::{ConstU32, ConstU64, FindAuthor},
+    PalletId,
 };
-use frame_election_provider_support::{
-    onchain,
-    bounds::{ElectionBounds, ElectionBoundsBuilder}
-};
-use pallet_session::historical::{ self as pallet_session_historical };
-use sp_core::{H256, crypto::key_types};
-use sp_runtime::{
-    KeyTypeId, 
-    traits::OpaqueKeys,
-    testing::UintAuthorityId
-};
-use sp_staking::SessionIndex;
+use frame_support_test::TestRandomness;
 use frame_system::{self as system};
-
-
-use pallet_gear_builtin::{
-    proxy,
-    bls12_381,
-    staking,
-    ActorWithId
+use pallet_session::historical::{self as pallet_session_historical};
+use sp_core::{crypto::key_types, H256};
+use sp_runtime::{testing::UintAuthorityId, traits::OpaqueKeys, KeyTypeId};
+use sp_runtime::{
+    traits::{BlakeTwo256, IdentityLookup},
+    Perbill, Permill,
 };
 
-use crate::staking_helper::{
-    FixedEraPayout,
-    OnChainSeqPhragmen
-};
+use pallet_gear_builtin::{bls12_381, proxy, staking, ActorWithId};
+
+use crate::staking_helper::{FixedEraPayout, OnChainSeqPhragmen};
 
 use crate::types::{
-    AccountId,
-    BlockNumber,
-    Balance,
-    Block,
-    BLOCK_AUTHOR,
-    EXISTENTIAL_DEPOSIT,
-    UNITS,
-    SESSION_DURATION_IN_BLOCKS
+    AccountId, Balance, Block, BlockNumber, BLOCK_AUTHOR, EXISTENTIAL_DEPOSIT,
+    SESSION_DURATION_IN_BLOCKS, UNITS,
 };
 
 // Configure a mock runtime to test the pallet.
@@ -111,7 +82,6 @@ common::impl_pallet_staking!(
     GenesisElectionProvider = onchain::OnChainExecution<OnChainSeqPhragmen>,
 );
 
-
 pub struct TestSessionHandler;
 impl pallet_session::SessionHandler<AccountId> for TestSessionHandler {
     const KEY_TYPE_IDS: &'static [KeyTypeId] = &[key_types::DUMMY];
@@ -132,7 +102,6 @@ parameter_types! {
     pub const Period: u64 = SESSION_DURATION_IN_BLOCKS;
     pub const Offset: u64 = SESSION_DURATION_IN_BLOCKS + 1;
 }
-
 
 impl pallet_session::Config for Test {
     type RuntimeEvent = RuntimeEvent;
@@ -162,14 +131,12 @@ pallet_gear::impl_config!(
     BuiltinDispatcherFactory = GearBuiltin,
 );
 
-
 impl pallet_gear_builtin::Config for Test {
     type RuntimeCall = RuntimeCall;
     type Builtins = (
         ActorWithId<1, bls12_381::Actor<Self>>,
         ActorWithId<2, staking::Actor<Self>>,
         ActorWithId<4, proxy::Actor<Self>>,
-
     );
     type BlockLimiter = GearGas;
     type WeightInfo = ();

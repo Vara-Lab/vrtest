@@ -526,7 +526,7 @@ When you call some functions of a contract, you will receive a builder, this bui
     - allow_other_panics: this functions will enable others panics, you can omit this method.
     - initial_gas: initial gas to be used in the message, this can be omitted.
     - gas_allowance: gas that can be used with the test, you can omit this function, this method can be omitted.
-    - payload: payload to send to the contract, it need to derive Encode and Clone traits.
+    - add_arg: payload to send to the contract, it need to derive Encode and Clone traits, you can set all your payload at once, Or you can add argument by argument by calling this function in order with each parameter of your smart contract's method
 - `CommandCall`: This will help you to build your message that will be send to your contract, you get this builder when you call the method `new_command`. It cocntains the next methods:
     - skip_waited: When your message enter in a waited state, the method will advance from block to block until the message leaves this state. You can omit this method.
     - transform_to_query: This method will transform your command into a query, it will no change the contract state or the signer banlance. If you omit this method, it will send a normal command to your contract.
@@ -538,7 +538,7 @@ When you call some functions of a contract, you will receive a builder, this bui
     - keep_alive: to keep alive the account who sign the transaction, you can omit this method.
     - with_value: The value that will be send with the message.
     - max_blocks_to_wait: In case that you will wait for the response from the contract, this set the max blocks to wait for the respose, you can omit this method (it will be wait for 5 blocks).
-    - payload: Payload that will be send to the contract, the payload need to derive the Encode and Clone traits, if it is omitted, you need to set the unit type with turbofish.
+    - add_arg: payload to send to the contract, it need to derive Encode and Clone traits, you can set all your payload at once, Or you can add argument by argument by calling this function in order with each parameter of your smart contract's method.
     - send: This method will send the command to the contract, it dont wait for the contracts response.
     - send_and_run_one_block: Same as send, but it wil go to the next block when finished.
     - send_recv: same as send, but it will go block by block to find the contract response.
@@ -618,7 +618,7 @@ When you upload a contract, the user that sign the transaction will transfer one
             // If your constructor dont have initial payload you can omit the
             // payload function, but you need to specify the unit type using 
             // turbofish:
-            let contract2 = Contract::upload_sails_contract::<()>()
+            let contract2 = Contract::upload_sails_contract()
                 .signer(SIGNER)   // Who will sign the upload of the contract
                 .salt("contract") // Salt to upload the contract
                 .app_constructor_name("New") // Contract constructor name
@@ -658,7 +658,7 @@ pub fn upload_wasm() {
             .upload(); // Contract wasm
 
         // Get the gas fees data and more estimations.
-        let gas_fees = contract.new_calculate_gas::<()>()
+        let gas_fees = contract.new_calculate_gas()
             .signer(SIGNER)
             .with_value(ONE_TOKEN)
             .service_name("ContractService")
@@ -702,7 +702,7 @@ pub fn upload_wasm() {
         let result = contract.new_command()
             .signer(SIGNER) // Set the signer
             .with_value(100 * ONE_TOKEN) // Send 100 Tokens
-            .payload(Request::Bond {  // Send the payload 
+            .add_arg(Request::Bond {  // add this aegument in the payload
                 value: 100 * ONE_TOKEN, 
                 payee: RewardAccount::Program 
             })
@@ -711,7 +711,7 @@ pub fn upload_wasm() {
 
         // Send a command without payload and get the response from the contract
         // The String type derive the Encode and Clone traits
-        let result = contract.new_command::<()>() // use turbofish
+        let result = contract.new_command() 
             .signer(SIGNER) // Set the signer
             .service_name("ContractService") // Set the service to call
             .method_name("SendValue") // Set the method to call
@@ -724,12 +724,9 @@ pub fn upload_wasm() {
             .signer(SIGNER) // Set the signer
             .service_name("ContractService") // Set the service to call
             .method_name("Bond") // Set the method to call
-            // The payload, is wrapped in a tupple because the method receives
-            // more than one argument.
-            .payload((  
-                100 * ONE_TOKEN,
-                RewardAccount::Program
-            ))
+            // Arguments are added in order to be added to the final payload.
+            .add_arg(100 * ONE_TOKEN)
+            .add_arg(RewardAccount::Program)
             .with_value(100 * ONE_TOKEN) // Set the value to send in the message
             .send_and_run_one_block(); // Send and go to the next block
     });

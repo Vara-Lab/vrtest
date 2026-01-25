@@ -10,9 +10,6 @@ use vrtest::{
     } 
 };
 use common::Origin;
-// use gprimitives::ActorId;
-
-// use gbuiltin_staking::RewardAccount;
 use demo_sails_staking_broker::WASM_BINARY;
 
 const REWARD_PAYEE: u64 = 15;
@@ -45,7 +42,7 @@ fn bonding_works() {
             .signer(SIGNER)
             .service_name("ContractService")
             .method_name("Bond")
-            .payload((
+            .add_arg((
                 100 * ONE_TOKEN,
                 RewardAccount::Program
             ))
@@ -59,37 +56,20 @@ fn bonding_works() {
         );
 
         // Asserting success
-        // let result = contract.new_command()
-        //     .signer(SIGNER)
-        //     .service_name("ContractService")
-        //     .method_name("Bond")
-        //     .payload((
-        //         100 * ONE_TOKEN,
-        //         RewardAccount::Program
-        //     ))
-        //     .with_value(100 * ONE_TOKEN)
-        //     .send_and_run_one_block();
 
-        let result = contract.new_command::<()>()
+        let result = contract.new_command()
             .signer(SIGNER)
             .service_name("ContractService")
             .method_name("Bond")
             .add_arg(100 * ONE_TOKEN)
             .add_arg(RewardAccount::Program)
-            // .payload((
-            //     100 * ONE_TOKEN,
-            //     RewardAccount::Program
-            // ))
             .with_value(100 * ONE_TOKEN)
-            .send_and_run_one_block2();
+            .send_and_run_one_block();
 
         assert!(result.is_ok());
 
-        // run_to_next_block();
-
         let signer_current_balance_at_block_2 = balance_from_user(SIGNER);
         
-
         // SIGNER has spent in current block:
         // - 100 UNITS sent as value to the contract
         // - paid for the burned gas
@@ -115,7 +95,7 @@ fn bonding_works() {
             .signer(SIGNER)
             .service_name("ContractService")
             .method_name("Bond")
-            .payload((
+            .add_arg((
                 50 * ONE_TOKEN,
                 RewardAccount::Program
             ))
@@ -126,30 +106,15 @@ fn bonding_works() {
         // should be called instead).
         // Note: the actual added amount is limited by the message `value` field, that is
         // it's going to be 50 UNITS, not 100 UNITS as encoded in the message payload.
-        // let result = contract.new_command()
-        //     .signer(SIGNER)
-        //     .service_name("ContractService")
-        //     .method_name("Bond")
-        //     .payload((
-        //         50 * ONE_TOKEN,
-        //         RewardAccount::Program
-        //     ))
-        //     .with_value(100 * ONE_TOKEN)
-        //     .send_and_run_one_block();
 
-        let result = contract.new_command::<()>()
+        let result = contract.new_command()
             .signer(SIGNER)
             .service_name("ContractService")
             .method_name("Bond")
-            // .payload((
-            //     50 * ONE_TOKEN,
-            //     RewardAccount::Program
-            // ))
             .add_arg(50 * ONE_TOKEN)
             .add_arg(RewardAccount::Program)
             .with_value(100 * ONE_TOKEN)
-            .send_and_run_one_block2();
-            // .send_and_run_one_block();
+            .send_and_run_one_block();
 
         assert!(result.is_ok());
 
@@ -190,10 +155,8 @@ fn unbonding_works() {
             .signer(SIGNER)
             .service_name("ContractService")
             .method_name("Bond")
-            .payload((
-                100 * ONE_TOKEN,
-                RewardAccount::Program
-            ))
+            .add_arg(100 * ONE_TOKEN)
+            .add_arg(RewardAccount::Program)
             .with_value(100 * ONE_TOKEN)
             .send_and_run_one_block();
 
@@ -209,7 +172,7 @@ fn unbonding_works() {
             .signer(SIGNER)
             .service_name("ContractService")
             .method_name("Unbond")
-            .payload(200 * ONE_TOKEN)
+            .add_arg(200 * ONE_TOKEN)
             .calculate_gas();
 
         // Sending `unbond` message
@@ -217,7 +180,7 @@ fn unbonding_works() {
             .signer(SIGNER)
             .service_name("ContractService")
             .method_name("Unbond")
-            .payload(200 * ONE_TOKEN)
+            .add_arg(200 * ONE_TOKEN)
             .send_and_run_one_block();
 
         assert!(result.is_ok());
@@ -240,7 +203,6 @@ fn nominators_payload_size_matters() {
             .upload();
 
         // Prepare large payload
-        // let mut targets = Vec::<ActorId>::new();
         let mut targets = Vec::<ActorId32>::new();
         for i in 100_u64..200_u64 {
             // targets.push(i.cast());
@@ -253,7 +215,7 @@ fn nominators_payload_size_matters() {
             .signer(SIGNER)
             .service_name("ContractService")
             .method_name("Nominate")
-            .payload(targets)
+            .add_arg(targets)
             .send_and_run_one_block();
 
         assert!(result.is_ok());
@@ -303,7 +265,7 @@ fn nominating_works() {
             .signer(SIGNER)
             .service_name("ContractService")
             .method_name("Nominate")
-            .payload(targets.clone())
+            .add_arg(targets.clone())
             .send_and_run_one_block();
 
         assert!(result.is_ok());
@@ -320,10 +282,8 @@ fn nominating_works() {
             .signer(SIGNER)
             .service_name("ContractService")
             .method_name("Bond")
-            .payload((
-                100 * ONE_TOKEN,
-                RewardAccount::Program
-            ))
+            .add_arg(100 * ONE_TOKEN)
+            .add_arg(RewardAccount::Program)
             .with_value(100 * ONE_TOKEN)
             .send_and_run_one_block();
 
@@ -341,7 +301,7 @@ fn nominating_works() {
             .signer(SIGNER)
             .service_name("ContractService")
             .method_name("Nominate")
-            .payload(targets.clone())
+            .add_arg(targets.clone())
             .send_and_run_one_block();
 
         assert!(result.is_ok());
@@ -378,10 +338,8 @@ fn withdraw_unbonded_works() {
             .signer(SIGNER)
             .service_name("ContractService")
             .method_name("Bond")
-            .payload((
-                500 * ONE_TOKEN,
-                RewardAccount::Program
-            ))
+            .add_arg(500 * ONE_TOKEN)
+            .add_arg(RewardAccount::Program)
             .with_value(500 * ONE_TOKEN)
             .send_and_run_one_block();
 
@@ -401,7 +359,7 @@ fn withdraw_unbonded_works() {
             .signer(SIGNER)
             .service_name("ContractService")
             .method_name("Unbond")
-            .payload(200 * ONE_TOKEN)
+            .add_arg(200 * ONE_TOKEN)
             .send_and_run_one_block();
 
         assert!(result.is_ok());
@@ -420,7 +378,7 @@ fn withdraw_unbonded_works() {
 
         // Sending `withdraw_unbonded` message
 
-        let result = contract.new_command::<()>()
+        let result = contract.new_command()
             .signer(SIGNER)
             .service_name("ContractService")
             .method_name("WithdrawUnbonded")
@@ -460,10 +418,8 @@ fn set_payee_works() {
             .signer(SIGNER)
             .service_name("ContractService")
             .method_name("Bond")
-            .payload((
-                100 * ONE_TOKEN,
-                RewardAccount::Program
-            ))
+            .add_arg(100 * ONE_TOKEN)
+            .add_arg(RewardAccount::Program)
             .with_value(100 * ONE_TOKEN)
             .send_and_run_one_block();
 
@@ -482,19 +438,8 @@ fn set_payee_works() {
             .signer(SIGNER)
             .service_name("ContractService")
             .method_name("SetPayee")
-            // .payload(RewardAccount::Custom(REWARD_PAYEE.into_origin().into()))
-            .payload(RewardAccount::Custom(ActorId32::from(REWARD_PAYEE)))
+            .add_arg(RewardAccount::Custom(ActorId32::from(REWARD_PAYEE)))
             .send_and_run_one_block();
-
-        // let result = contract.new_command()
-        //     .payload(ActorId::from(SIGNER.into_origin()))
-            
-            // .signer(SIGNER)
-            // .service_name("")
-            // .method_name("")
-            // .send_recv::<ActorId>();
-
-        // assert!(result.is_ok());
 
         // Assert the `payee` is now set to SIGNER
         let contract_payee = contract.payee_ledger();
@@ -522,10 +467,8 @@ fn rebond_works() {
             .signer(SIGNER)
             .service_name("ContractService")
             .method_name("Bond")
-            .payload((
-                500 * ONE_TOKEN,
-                RewardAccount::Program
-            ))
+            .add_arg(500 * ONE_TOKEN)
+            .add_arg(RewardAccount::Program)
             .with_value(500 * ONE_TOKEN)
             .send_and_run_one_block();
 
@@ -543,7 +486,7 @@ fn rebond_works() {
             .signer(SIGNER)
             .service_name("ContractService")
             .method_name("Unbond")
-            .payload(400 * ONE_TOKEN)
+            .add_arg(400 * ONE_TOKEN)
             .send_and_run_one_block();
 
         assert!(result.is_ok());
@@ -568,7 +511,7 @@ fn rebond_works() {
             .signer(SIGNER)
             .service_name("ContractService")
             .method_name("Rebond")
-            .payload(200 * ONE_TOKEN)
+            .add_arg(200 * ONE_TOKEN)
             .send_and_run_one_block();
 
         assert!(result.is_ok());
@@ -590,7 +533,7 @@ fn rebond_works() {
             .signer(SIGNER)
             .service_name("ContractService")
             .method_name("Rebond")
-            .payload(300 * ONE_TOKEN)
+            .add_arg(300 * ONE_TOKEN)
             .send_and_run_one_block();
 
         assert!(result.is_ok());
@@ -640,7 +583,7 @@ fn payout_stakers_works() { // rewards
             .signer(SIGNER)
             .service_name("ContractService")
             .method_name("Bond")
-            .payload((
+            .add_arg((
                 250 * ONE_TOKEN,
                 // RewardAccount::Custom(REWARD_PAYEE.into_origin().into()) 
                 RewardAccount::Custom(ActorId32::from(REWARD_PAYEE)) 
@@ -657,7 +600,7 @@ fn payout_stakers_works() { // rewards
             .signer(SIGNER)
             .service_name("ContractService")
             .method_name("Nominate")
-            .payload(targets.clone())
+            .add_arg(targets.clone())
             .send_and_run_one_block();
 
         assert!(result.is_ok());
@@ -683,7 +626,7 @@ fn payout_stakers_works() { // rewards
             .signer(SIGNER)
             .service_name("ContractService")
             .method_name("PayoutStakers")
-            .payload((
+            .add_arg((
                 // ActorId::from_origin(VAL_1_STASH.into_origin()),
                 ActorId32::from(VAL_1_STASH),
                 1

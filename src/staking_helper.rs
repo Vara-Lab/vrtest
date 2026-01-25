@@ -1,27 +1,11 @@
+use crate::mock::{Staking, Test};
+use crate::types::{AccountId, Balance, EXISTENTIAL_DEPOSIT};
 use frame_election_provider_support::{
-    onchain,
-    SequentialPhragmen,
-    bounds::{
-        ElectionBounds,
-        ElectionBoundsBuilder
-    }
+    bounds::{ElectionBounds, ElectionBoundsBuilder},
+    onchain, SequentialPhragmen,
 };
 use frame_support::parameter_types;
-use sp_runtime::{
-    Perbill,
-    traits::ConstU32,
-};
-use sp_staking::SessionIndex;
-use crate::mock::{
-    Test,
-    Staking
-};
-use crate::types::{
-    AccountId,
-    Balance,
-    EXISTENTIAL_DEPOSIT
-};
-
+use sp_runtime::{traits::ConstU32, Perbill};
 
 parameter_types! {
     pub const BlockHashCount: u64 = 250;
