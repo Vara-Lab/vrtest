@@ -12,7 +12,9 @@ use super::builders::{
     // QueryCall,
     CalculateGasCall,
     UploadSailsWasm,
-    UploadWasm
+    UploadWasm,
+    UploadCode,
+    CreateContract
 };
 
 pub struct Contract {
@@ -33,6 +35,14 @@ impl Contract {
 
     pub fn address(&self) -> ActorId {
         self.address
+    }
+
+    pub fn create_contract<R: Encode>() -> CreateContract<R> {
+        CreateContract::new()
+    }
+
+    pub fn upload_code() -> UploadCode {
+        UploadCode::default()
     }
 
     pub fn upload_contract() -> UploadWasm {

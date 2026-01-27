@@ -48,7 +48,7 @@ pub fn hello_send_message_get_reply() {
             .wasm(WASM_BINARY)
             .upload();
 
-        let x = contract.new_command()
+        let result = contract.new_command()
             .signer(SIGNER)
             .service_name("ContractService")
             .method_name("Hello")
@@ -57,12 +57,12 @@ pub fn hello_send_message_get_reply() {
             // Set the return type from the contract
             .send_recv::<String>();
 
-        if let Err(error) = x {
+        if let Err(error) = result {
             println!("{:?}", error);
             panic!("Command error");
         }
 
-        let ContractResponse::Response(response) = x.unwrap() else {
+        let ContractResponse::Response(response) = result.unwrap() else {
             panic!("Incorrect response");
         };
 
