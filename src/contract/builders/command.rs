@@ -290,6 +290,8 @@ impl CommandCall {
         let contract_address = self.contract_address
             .clone();
 
+        let get_waited = self.get_waited;
+
         self.send_and_run_one_block()?;
 
         let msg_id = runtime::message_id_fom_message_sent(
@@ -315,7 +317,9 @@ impl CommandCall {
                         }
                         // si cayó a waitlist, avanza más bloques hasta woken + dispatched
                         GearEvent::MessageWaited { id, .. } if *id == msg_id => {
-                            return Ok(());
+                            if get_waited {
+                                return Ok(());
+                            }
                         },
                         _ => {}
                     }
