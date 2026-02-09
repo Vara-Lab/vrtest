@@ -70,6 +70,11 @@ pub fn era_duration_ms() -> u128 {
     (era_duration_in_blocks() as u128).saturating_mul(block_in_ms() as u128)
 }
 
+/// ## Get the current timestamp
+pub fn current_timestamp() -> u64 {
+    Timestamp::get()
+}
+
 /// ## Get the current block number
 pub fn current_block() -> u64 {
     System::block_number()

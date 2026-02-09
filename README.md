@@ -19,6 +19,7 @@ vrtest is a testing crate that will help you test your smart contracts, with the
     - [sessions_per_era](#sessions_per_era_function)
     - [era_duration_in_blocks](#era_duration_in_blocks_function)
     - [era_duration_ms](#era_duration_ms_function)
+    - [current_timestamp](#current_timestamp_function)
     - [current_block](#current_block_function)
     - [current_session_index](#current_session_index_function)
     - [current_era](#current_era_function)
@@ -329,6 +330,34 @@ vrtests has many functions that you can use to change the current block, find ou
             assert_eq!(
                 era_duration_ms(),
                 43_200_000
+            );
+
+            // test logic ...
+        });
+    }
+    ```
+
+<a id="current_timestamp_function"></a>
+
+- `current_timestamp`: Returns the current timestamp. Example:
+
+    ```rust
+    use vrtest::runtime::*;
+
+    const SIGNER: u64 = 1;
+
+    #[test]
+    pub fn init_runtime_test() {
+        init_logger(); // Init the logger
+
+        // Will fund 1000 Tokens to SIGNER
+        new_test_ext(vec![SIGNER]).execute_with(|| { // or new_test_ext_with_authorities_and_sessions
+            run_for_n_blocks(100, None);
+            // Current block: 101
+
+            assert_eq!(
+                current_timestamp(), // Get the current block
+                300_000
             );
 
             // test logic ...

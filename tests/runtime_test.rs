@@ -57,6 +57,11 @@ pub fn test_correct_block_count_for_sessions_and_eras() {
         );
 
         assert_eq!(
+            current_timestamp(),
+            3_000
+        );
+
+        assert_eq!(
             current_block(),
             1
         );
@@ -349,6 +354,9 @@ pub fn test_correct_block_count_for_sessions_and_eras() {
             current_era(),
             3
         );
+
+        println!("AVR EL TIMESTAMP ACTUAL: {}", current_timestamp());
+        // 122403000
     });
 }
 
