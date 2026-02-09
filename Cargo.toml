@@ -4,7 +4,7 @@ description = "vara runtime tests to test contracts and built-in actors"
 edition = "2021"
 license = "MIT"
 readme = "README.md"
-version = "0.9.0"
+version = "0.9.3"
 
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]

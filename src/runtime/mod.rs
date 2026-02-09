@@ -60,12 +60,12 @@ pub fn sessions_per_era() -> u64 {
     <Test as pallet_staking::Config>::SessionsPerEra::get() as u64
 }
 
-/// Era duration in blocks - 1_250
+/// Era duration in blocks - 14_400
 pub fn era_duration_in_blocks() -> u64 {
     session_duration_in_blocks().saturating_mul(sessions_per_era())
 }
 
-/// Era duration in milliseconds - 1_500 * 1000
+/// Era duration in milliseconds - 14_400 * 3_000 = 43_200_000
 pub fn era_duration_ms() -> u128 {
     (era_duration_in_blocks() as u128).saturating_mul(block_in_ms() as u128)
 }

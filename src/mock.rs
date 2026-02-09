@@ -73,7 +73,7 @@ parameter_types! {
 common::impl_pallet_system!(Test);
 common::impl_pallet_balances!(Test);
 common::impl_pallet_authorship!(Test, EventHandler = Staking);
-common::impl_pallet_timestamp!(Test);
+// common::impl_pallet_timestamp!(Test);
 common::impl_pallet_staking!(
     Test,
     EraPayout = FixedEraPayout::<{ 100 * UNITS }>,
@@ -103,6 +103,13 @@ parameter_types! {
     pub const Offset: u64 = SESSION_DURATION_IN_BLOCKS + 1;
 }
 
+impl pallet_timestamp::Config for Test {
+    type MinimumPeriod = MinimumPeriod;
+    type Moment = u64;
+    type OnTimestampSet = ();
+    type WeightInfo = ();
+}
+
 impl pallet_session::Config for Test {
     type RuntimeEvent = RuntimeEvent;
     type ValidatorId = AccountId;
@@ -119,6 +126,8 @@ impl pallet_session_historical::Config for Test {
     type FullIdentification = pallet_staking::Exposure<AccountId, u128>;
     type FullIdentificationOf = pallet_staking::ExposureOf<Test>;
 }
+
+
 
 pallet_gear_bank::impl_config!(Test);
 pallet_gear_gas::impl_config!(Test);

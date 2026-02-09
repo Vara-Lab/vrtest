@@ -9,34 +9,34 @@ const VAL_1_STASH_AUTH_ID: u64 = 11;
 #[test]
 pub fn test_runtime_time_functions() {
     new_test_ext(vec![SIGNER]).execute_with(|| {
-        // Block duration 1000 ms
+        // Block duration 3000 ms
         assert_eq!(
             block_in_ms(),
-            1_000
+            3_000
         );
 
-        // Sessions per era =  5
+        // Sessions per era = 6
         assert_eq!(
             sessions_per_era(),
             6
         );
 
-        // Session duration in blocks = 250
+        // Session duration in blocks = 2_400 (2 hours)
         assert_eq!(
             session_duration_in_blocks(),
-            250
+            2_400
         );
 
-        // Era duration in blocks
+        // Era duration in blocks (12 hours)
         assert_eq!(
             era_duration_in_blocks(),
-            1_500
+            14_400
         );
 
         // Era duration in ms
         assert_eq!(
             era_duration_ms(),
-            1_500_000
+            43_200_000
         )
         
     });
@@ -66,16 +66,16 @@ pub fn test_correct_block_count_for_sessions_and_eras() {
             0
         );
 
-        // block 251 - session 1 ----------------------------
+        // block 2_400 - session 1 ----------------------------
 
        { run_for_n_blocks( 
-            250, 
+            2_400, 
             None
         );
 
         assert_eq!(
             current_block(),
-            251
+            2_401
         );
 
         assert_eq!(
@@ -88,16 +88,16 @@ pub fn test_correct_block_count_for_sessions_and_eras() {
             0
         );}
 
-        // block 501 - session 2 ----------------------------
+        // block 4_800 - session 2 ----------------------------
 
         {run_for_n_blocks( 
-            250, 
+            2_400, 
             None
         );
 
         assert_eq!(
             current_block(),
-            501
+            4_801
         );
 
         assert_eq!(
@@ -110,16 +110,16 @@ pub fn test_correct_block_count_for_sessions_and_eras() {
             0
         );}
 
-        // block 751 - session 3 ----------------------------
+        // block 7_200 - session 3 ----------------------------
 
        { run_for_n_blocks( 
-            250, 
+            2_400, 
             None
         );
 
         assert_eq!(
             current_block(),
-            751
+            7_201
         );
 
         assert_eq!(
@@ -132,16 +132,16 @@ pub fn test_correct_block_count_for_sessions_and_eras() {
             0
         );}
 
-        // block 1001 - session 4 ----------------------------
+        // block 9_600 - session 4 ----------------------------
 
         run_for_n_blocks( 
-            250, 
+            2_400, 
             None
         );
 
         assert_eq!(
             current_block(),
-            1001
+            9_601
         );
 
         assert_eq!(
@@ -154,16 +154,16 @@ pub fn test_correct_block_count_for_sessions_and_eras() {
             0
         );
 
-        // block 1251 - session 5 ----------------------------
+        // block 12000 - session 5 ----------------------------
 
         run_for_n_blocks( 
-            250, 
+            2_400, 
             None
         );
 
         assert_eq!(
             current_block(),
-            1251
+            12_001
         );
 
         assert_eq!(
@@ -176,16 +176,16 @@ pub fn test_correct_block_count_for_sessions_and_eras() {
             1
         );
 
-        // block 1501 - session 6 ----------------------------
+        // block 14_400 - session 6 ----------------------------
 
         run_for_n_blocks( 
-            250, 
+            2_400, 
             None
         );
 
         assert_eq!(
             current_block(),
-            1501
+            14_401
         );
 
         assert_eq!(
@@ -198,16 +198,16 @@ pub fn test_correct_block_count_for_sessions_and_eras() {
             1
         );
 
-        // block 1751 - session 7 ----------------------------
+        // block 16_800 - session 7 ----------------------------
 
         run_for_n_blocks( 
-            250, 
+            2400, 
             None
         );
 
         assert_eq!(
             current_block(),
-            1751
+            16_801
         );
 
         assert_eq!(
@@ -220,16 +220,16 @@ pub fn test_correct_block_count_for_sessions_and_eras() {
             1
         );
 
-        // block 2001 - session 8 ----------------------------
+        // block 19_200 - session 8 ----------------------------
 
         run_for_n_blocks( 
-            250, 
+            2_400, 
             None
         );
 
         assert_eq!(
             current_block(),
-            2001
+            19_201
         );
 
         assert_eq!(
@@ -242,16 +242,16 @@ pub fn test_correct_block_count_for_sessions_and_eras() {
             1
         );
 
-        // block 2251 - session 9 ----------------------------
+        // block 21_600 - session 9 ----------------------------
 
         run_for_n_blocks( 
-            250, 
+            2_400, 
             None
         );
 
         assert_eq!(
             current_block(),
-            2251
+            21_601
         );
 
         assert_eq!(
@@ -264,16 +264,16 @@ pub fn test_correct_block_count_for_sessions_and_eras() {
             1
         );
 
-        // block 2501 - session 10 ----------------------------
+        // block 24_000 - session 10 ----------------------------
 
         run_for_n_blocks( 
-            250, 
+            2_400, 
             None
         );
 
         assert_eq!(
             current_block(),
-            2501
+            24_001
         );
 
         assert_eq!(
@@ -286,16 +286,16 @@ pub fn test_correct_block_count_for_sessions_and_eras() {
             1
         );
 
-        // block 2751 - session 11 ----------------------------
+        // block 26_400 - session 11 ----------------------------
 
         run_for_n_blocks( 
-            250, 
+            2400, 
             None
         );
 
         assert_eq!(
             current_block(),
-            2751
+            26_401
         );
 
         assert_eq!(
@@ -309,13 +309,13 @@ pub fn test_correct_block_count_for_sessions_and_eras() {
         );
 
         run_for_n_blocks( // Run 5 sessions
-            1250, 
+            12_000, 
             None
         );
 
         assert_eq!(
             current_block(),
-            4001
+            38_401
         );
 
         assert_eq!(
@@ -328,16 +328,16 @@ pub fn test_correct_block_count_for_sessions_and_eras() {
             2
         );
 
-        // block 4251 - session 17 ----------------------------
+        // block 40_800 - session 17 ----------------------------
 
         run_for_n_blocks( 
-            250, 
+            2_400, 
             None
         );
 
         assert_eq!(
             current_block(),
-            4251
+            40_801
         );
 
         assert_eq!(

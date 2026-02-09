@@ -33,12 +33,12 @@ vrtest is a testing crate that will help you test your smart contracts, with the
 
 <a id="vrtests_limitations_section"></a>
 
-## 🚧 vrtests limitations
+## 🚧 vrtests considerations
 
-vrtests has some limitations, such as the times handled within the runtime:
+vrtests has some considerations, such as the times handled within the runtime:
 
-- The time of each block is *1000 ms*.
-- Each session lasts *250 blocks*.
+- The time of each block is *3000 ms* (same as `testnet` and `mainnet`).
+- Each session lasts *2_400 blocks* (or 2 hours, check the [wiki](https://wiki.vara.network/docs/staking) for more details).
 - Each era lasts 6 sessions, however, at the beginning (genesis) the first era will last 5 sessions, the following ones will last 6 sessions each era.
 - `Block transition`: You need to handle by yourself the block transition in the runtime, some functions in vrtests 
 
@@ -52,13 +52,30 @@ When creating your smart contract, it is recommended that you use the smart cont
 
 ## 📦 Installation
 
-The purpose of this crate is to be used only for testing, so you must import the crate as follows in your Cargo.toml in the "dev-dependencies" section:
+The purpose of this crate is to be used only for testing, so you must import the crate as follows in your Cargo.toml in the "dev-dependencies" section,
+and set a `patch` to work with same dependencias as vrtest:
 
 ```toml
 [dev-dependencies]
 vrtest = { git = "https://github.com/Vara-Lab/vrtest.git" }
 # more crates ...
+
+[patch.crates-io] #patch
+gsys = { git = "https://github.com/gear-tech/gear.git", tag = "v1.10.0" }
+gstd = { git = "https://github.com/gear-tech/gear.git", tag = "v1.10.0" }
+gear-core = { git = "https://github.com/gear-tech/gear.git", tag = "v1.10.0" }
+gear-core-errors = { git = "https://github.com/gear-tech/gear.git", tag = "v1.10.0" }
+gprimitives = { git = "https://github.com/gear-tech/gear.git", tag = "v1.10.0" }
+gclient = { git = "https://github.com/gear-tech/gear.git", tag = "v1.10.0" }
+gtest = { git = "https://github.com/gear-tech/gear.git", tag = "v1.10.0" }
+gbuiltin-staking = { git = "https://github.com/gear-tech/gear.git", tag = "v1.10.0" }
+gear-common = { git = "https://github.com/gear-tech/gear.git", tag = "v1.10.0" }
+gear-wasm-builder = { git = "https://github.com/gear-tech/gear.git", tag = "v1.10.0" }
+gcore = { git = "https://github.com/gear-tech/gear.git", tag = "v1.10.0" }
+
 ```
+
+Finally, you have to work rust 1.91 because of some sails crates.
 
 <a id="runtime_functions_section"></a>
 
@@ -211,7 +228,7 @@ vrtests has many functions that you can use to change the current block, find ou
         new_test_ext(vec![SIGNER]).execute_with(|| { // or new_test_ext_with_authorities_and_sessions
             assert_eq!(
                 block_in_ms(), // Block time in milliseconds
-                1_000
+                3_000
             );
 
             // test logic ...
@@ -221,7 +238,7 @@ vrtests has many functions that you can use to change the current block, find ou
 
 <a id="session_duration_in_blocks_function"></a>
 
-- `session_duration_in_blocks`: session duration in blocks (250 blocks). Example: 
+- `session_duration_in_blocks`: session duration in blocks (2400 blocks). Example: 
 
     ```rust
     use vrtest::runtime::*;
@@ -236,7 +253,7 @@ vrtests has many functions that you can use to change the current block, find ou
         new_test_ext(vec![SIGNER]).execute_with(|| { // or new_test_ext_with_authorities_and_sessions
             assert_eq!(
                 session_duration_in_blocks(),
-                250
+                2_400
             );
 
             // test logic ...
@@ -271,7 +288,7 @@ vrtests has many functions that you can use to change the current block, find ou
 
 <a id="era_duration_in_blocks_function"></a>
 
-- `era_duration_in_blocks`: Return the era duration in blocks (1_500). Example:
+- `era_duration_in_blocks`: Return the era duration in blocks (14_400). Example:
 
     ```rust
     use vrtest::runtime::*;
@@ -286,7 +303,7 @@ vrtests has many functions that you can use to change the current block, find ou
         new_test_ext(vec![SIGNER]).execute_with(|| { // or new_test_ext_with_authorities_and_sessions
             assert_eq!(
                 era_duration_in_blocks(),
-                1_500
+                14_400
             );
 
             // test logic ...
@@ -296,7 +313,7 @@ vrtests has many functions that you can use to change the current block, find ou
 
 <a id="era_duration_ms_function"></a>
 
-- `era_duration_ms`: Era duration in milliseconds (1_500_000). Example:
+- `era_duration_ms`: Era duration in milliseconds (43_200_000). Example:
 
     ```rust
     use vrtest::runtime::*;
@@ -311,7 +328,7 @@ vrtests has many functions that you can use to change the current block, find ou
         new_test_ext(vec![SIGNER]).execute_with(|| { // or new_test_ext_with_authorities_and_sessions
             assert_eq!(
                 era_duration_ms(),
-                1_500_000
+                43_200_000
             );
 
             // test logic ...
@@ -448,7 +465,7 @@ vrtests has many functions that you can use to change the current block, find ou
         new_test_ext(vec![SIGNER]).execute_with(|| { // or new_test_ext_with_authorities_and_sessions
             assert_eq!(
                 era_duration_in_blocks(),
-                1_500
+                14_400
             );
 
             // test logic ...

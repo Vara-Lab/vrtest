@@ -20,13 +20,13 @@ pub const ENDOWMENT: u128 = 1_000 * UNITS;
 
 pub(crate) const UNITS: u128 = 1_000_000_000_000; // 10^(-12) precision
 #[allow(unused)]
-pub(crate) const MILLISECS_PER_BLOCK: u64 = 2_400;
+pub(crate) const MILLISECS_PER_BLOCK: u64 = 3_000;
 
 pub(crate) const DEFAULT_GAS_LIMIT: u64 = 20_000_000_000;
 
 // Staking consts
 
-pub const SESSION_DURATION_IN_BLOCKS: u64 = 250;
+pub const SESSION_DURATION_IN_BLOCKS: u64 = 2_400; // 250;
 
 #[derive(PartialEq)]
 pub enum StakingEventType {
